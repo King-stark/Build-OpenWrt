@@ -11,6 +11,7 @@
 #
 
 # Modify default IP
+git clone https://github.com/jerrykuku/luci-app-ttnode package/ttnode
 sed -i 's/192.168.1.1/192.168.31.2/g' package/base-files/files/bin/config_generate
 rm -rf package/lean/luci-theme-argon
 sed -i 's/luci-theme-bootstrap/luci-theme-argon/' feeds/luci/collections/luci/Makefile
