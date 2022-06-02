@@ -25,7 +25,7 @@ env:
   CONFIG_FILE: .config
   DIY_P1_SH: diy-part1.sh
   DIY_P2_SH: diy-part2.sh
-  UPLOAD_BIN_DIR: false
+  UPLOAD_BIN_DIR: true
   UPLOAD_FIRMWARE: false
   UPLOAD_COWTRANSFER: true
   UPLOAD_WETRANSFER: true
@@ -45,7 +45,7 @@ jobs:
     steps:
 
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@main
 
       - name: 环境配置
         env:
@@ -150,7 +150,7 @@ jobs:
         if: steps.organize.outputs.status == 'success' && !cancelled()
         env:
           OPENWRT_ARMVIRT: openwrt/bin/targets/*/*/*.tar.gz
-          PACKAGE_SOC: s905d_vplus
+          PACKAGE_SOC: s905d
           WHOAMI: king-stark/github
           KERNEL_VERSION_NAME: 5.4.188_5.15.44_5.17.12
           KERNEL_AUTO_LATEST: true
@@ -158,14 +158,14 @@ jobs:
           #ENABLE_WIFI_K504: 1
           #ENABLE_WIFI_K510: 0
 
-      - name: Upload firmware to cowtransfer
+      - name: Upload firmware to Musetransfer
         id: cowtransfer
         if: env.PACKAGED_STATUS == 'success' && env.UPLOAD_COWTRANSFER == 'true' && !cancelled()
         run: |
           curl -fsSL git.io/file-transfer | sh
-          ./transfer cow --block 2621440 -s -p 64 --no-progress ${FIRMWARE} 2>&1 | tee cowtransfer.log
-          echo "::warning file=cowtransfer.com::$(cat cowtransfer.log | grep https)"
-          echo "::set-output name=url::$(cat cowtransfer.log | grep https | cut -f3 -d" ")"
+          ./transfer muse -s -p 32 --no-progress ${PACKAGED_OUTPUTPATH} ${FIRMWARE} 2>&1 | tee Musetransfer.log
+          echo "::warning file=Musetransfer.com::$(cat Musetransfer.log | grep https)"
+          echo "::set-output name=url::$(cat Musetransfer.log | grep https | cut -f3 -d" ")"
 
       - name: Upload firmware to WeTransfer
         id: wetransfer
