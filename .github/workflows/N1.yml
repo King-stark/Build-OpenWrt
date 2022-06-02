@@ -28,7 +28,7 @@ env:
   DIY_P2_SH: diy-part2.sh
   UPLOAD_BIN_DIR: true
   UPLOAD_FIRMWARE: true
-  UPLOAD_COWTRANSFER: true
+  UPLOAD_MUSETRANSFER: true
   UPLOAD_WETRANSFER: true
   UPLOAD_RELEASE: true
   TZ: Asia/Shanghai
@@ -144,21 +144,20 @@ jobs:
         #ENABLE_WIFI_K504: 1
         #ENABLE_WIFI_K510: 0
 
-    - name: Upload firmware to cowtransfer
-      id: cowtransfer
-      if: env.PACKAGED_STATUS == 'success' && env.UPLOAD_COWTRANSFER == 'true' && !cancelled()
+    - name: Upload firmware to Musetransfer
+      id: musetransfer
+      if: env.PACKAGED_STATUS == 'success' && env.UPLOAD_MUSETRANSFER == 'true' && !cancelled()
       run: |
         curl -fsSL git.io/file-transfer | sh
-        ./transfer cow --block 2621440 -s -p 64 --no-progress ${FIRMWARE} 2>&1 | tee cowtransfer.log
-        echo "::warning file=cowtransfer.com::$(cat cowtransfer.log | grep https)"
-        echo "::set-output name=url::$(cat cowtransfer.log | grep https | cut -f3 -d" ")"
-   
+        ./transfer muse -s -p 32 --no-progress ${PACKAGED_OUTPUTPATH} ${FIRMWARE} 2>&1 | tee Musetransfer.log
+        echo "::warning file=Musetransfer.com::$(cat Musetransfer.log | grep https)"
+        echo "::set-output name=url::$(cat Musetransfer.log | grep https | cut -f3 -d" ")"
     - name: Upload firmware to WeTransfer
       id: wetransfer
       if: env.PACKAGED_STATUS == 'success' && env.UPLOAD_WETRANSFER == 'true' && !cancelled()
       run: |
         curl -fsSL git.io/file-transfer | sh
-        ./transfer wet -s -p 16 --no-progress ${FIRMWARE} 2>&1 | tee wetransfer.log
+        ./transfer wet -s -p 16 --no-progress ${PACKAGED_OUTPUTPATH} 2>&1 | tee wetransfer.log
         echo "::warning file=wetransfer.com::$(cat wetransfer.log | grep https)"
         echo "::set-output name=url::$(cat wetransfer.log | grep https | cut -f3 -d" ")"
 
@@ -168,7 +167,7 @@ jobs:
       run: |
         echo "::set-output name=release_tag::$(date +"%Y.%m.%d-%H%M")"
         touch release.txt
-        [ $UPLOAD_COWTRANSFER = true ] && echo "🔗 [Cowtransfer](${{ steps.cowtransfer.outputs.url }})" >> release.txt
+        [ $UPLOAD_MUSETRANSFER = true ] && echo "🔗 [Musetransfer](${{ steps.musetransfer.outputs.url }})" >> release.txt
         [ $UPLOAD_WETRANSFER = true ] && echo "🔗 [WeTransfer](${{ steps.wetransfer.outputs.url }})" >> release.txt
         cat >> release.txt <<EOF
         This is OpenWrt firmware for Armvirt 64
