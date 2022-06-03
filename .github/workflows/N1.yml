@@ -122,6 +122,7 @@ jobs:
         make defconfig
         make download -j8 || make download -j1 V=s 
         rm -rf $(find ./dl/ -size -1024c)
+        cat .config
         df -h
 
     - name: Cache Toolchain
@@ -185,7 +186,7 @@ jobs:
       if: env.PACKAGED_STATUS == 'success' && env.UPLOAD_MUSETRANSFER == 'true' && !cancelled()
       run: |
         curl -fsSL git.io/file-transfer | sh
-        ./transfer muse -s -p 64 --no-progress ${FIRMWARE} ${PACKAGED_OUTPUTPATH} 2>&1 | tee Musetransfer.log
+        ./transfer muse -s -p 64 --no-progress ${PACKAGED_OUTPUTPATH} 2>&1 | tee Musetransfer.log
         echo "::warning file=Musetransfer.com::$(cat Musetransfer.log | grep https)"
         echo "::set-output name=url::$(cat Musetransfer.log | grep https | cut -f3 -d" ")"
 
@@ -202,7 +203,7 @@ jobs:
       id: tag
       if: env.PACKAGED_STATUS == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "::set-output name=release_tag::$(env.PRODUCT_NAME date +"%Y.%m.%d-%H%M")"
+        echo "::set-output name=release_tag::$(date +"%Y.%m.%d-%H%M")"
         touch release.txt
         [ $UPLOAD_MUSETRANSFER = true ] && echo "🔗 [Musetransfer](${{ steps.musetransfer.outputs.url }})" >> release.txt
         [ $UPLOAD_WETRANSFER = true ] && echo "🔗 [WeTransfer](${{ steps.wetransfer.outputs.url }})" >> release.txt
