@@ -254,8 +254,8 @@ jobs:
       run: |
         MSG="
         ${{ env.PRODUCT_NAME }} 编译完成
-        [ $UPLOAD_MUSETRANSFER = true ] && "🔗 [Musetransfer](${{ steps.musetransfer.outputs.url }})"
-        [ $UPLOAD_WETRANSFER = true ] && "🔗 [WeTransfer](${{ steps.wetransfer.outputs.url }})"
+        🔗 [Musetransfer](${{ steps.musetransfer.outputs.url }})
+        🔗 [WeTransfer](${{ steps.wetransfer.outputs.url }})
         编译时间：${{ env.DATE }}
         OpenWrt 更新信息：${{ env.useVersionInfo }}
         
