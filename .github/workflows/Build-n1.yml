@@ -115,14 +115,12 @@ jobs:
       run: |
         cd openwrt
         make defconfig
-        wget http://ali.kodbox.ga/openwrt/dl.tar.gz
-        tar -zxf dl.tar.gz
         make download -j8 || make download -j1 V=s 
-        
         rm -rf $(find ./dl/ -size -1024c)
         
-        df -h
-    - name: Cache Toolchain
+        du -h --max-depth=1*
+
+    - name: Ccache Toolchain
       uses: klever1988/cachewrtbuild@main
       with:
         ccache: 'true'
