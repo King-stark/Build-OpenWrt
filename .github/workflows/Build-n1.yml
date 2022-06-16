@@ -115,7 +115,8 @@ jobs:
       run: |
         cd openwrt
         make defconfig
-        wget http://ali.kodbox.ga/openwrt/dl.tar.gz && tar -zxf dl.tar.gz
+        wget http://ali.kodbox.ga/openwrt/dl.tar.gz
+        tar -zxf dl.tar.gz
         make download -j8 || make download -j1 V=s 
         
         rm -rf $(find ./dl/ -size -1024c)
