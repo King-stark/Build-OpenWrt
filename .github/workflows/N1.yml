@@ -185,7 +185,7 @@ jobs:
       if: env.PACKAGED_STATUS == 'success' && env.UPLOAD_MUSETRANSFER == 'true' && !cancelled()
       run: |
         curl -fsSL git.io/file-transfer | sh
-        ./transfer muse -s -p 16 --no-progress ${PACKAGED_OUTPUTPATH} 2>&1 | tee Musetransfer.log
+        ./transfer muse -s -p 64 --no-progress ${PACKAGED_OUTPUTPATH} 2>&1 | tee Musetransfer.log
         echo "::warning file=Musetransfer.com::$(cat Musetransfer.log | grep https)"
         echo "::set-output name=url::$(cat Musetransfer.log | grep https | cut -f3 -d" ")"
 
