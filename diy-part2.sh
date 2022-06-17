@@ -16,4 +16,5 @@ rm -rf package/lean/luci-theme-argon
 sed -i 's/luci-theme-bootstrap/luci-theme-argonne/' feeds/luci/collections/luci/Makefile
 
 # 添加额外软件包
-svn co https://github.com/jerrykuku/luci-app-ttnode package/ttnode
+# svn co https://github.com/jerrykuku/luci-app-ttnode package/ttnode
+git clone https://github.com/jerrykuku/luci-app-ttnode package/ttnode
