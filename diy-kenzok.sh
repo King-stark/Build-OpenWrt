@@ -1,5 +1,5 @@
 #!/bin/sh
-#
+# 自用
 # 拉取lede源码后，cd lede 执行本sh运行包
 
 # 添加kenzok8 的 luci包
@@ -9,7 +9,7 @@ sed -i '$a src-git small https://github.com/kenzok8/small' feeds.conf.default
 # update feeds 
 ./scripts/feeds update -a
 
-# 删除feed源重复的软件包
+# 删除以下feed源重复的软件包
 # lede: https://github.com/coolsnowwolf/luci
 # kenzok8: https://github.com/kenzok8/openwrt-packages
 
