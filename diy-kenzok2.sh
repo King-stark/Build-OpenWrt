@@ -30,3 +30,5 @@ rm -rf feeds/luci/themes/luci-theme-argon
 # 替换默认主题为 luci-theme-argon
 sed -i 's/luci-theme-bootstrap/luci-theme-argon/' feeds/luci/collections/luci/Makefile
 
+# update & install feeds
+./scripts/feeds update -a && ./scripts/feeds install -a
