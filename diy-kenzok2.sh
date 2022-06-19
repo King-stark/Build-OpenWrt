@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-
+#
 
 # Modify default ip & theme
 sed -i 's/192.168.1.1/192.168.31.2/g' package/base-files/files/bin/config_generate
@@ -31,7 +31,3 @@ rm -rf feeds/kenzo/luci-app-pushbot
 # 自定义添加额外软件包
 # 甜糖心愿自动收集
 svn co https://github.com/jerrykuku/luci-app-ttnode/trunk package/luci-app-ttnode
-
-
-# update & install feeds
-./scripts/feeds update -a && ./scripts/feeds install -a
