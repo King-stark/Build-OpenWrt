@@ -127,6 +127,9 @@ jobs:
       run: |
         cd openwrt
         make defconfig
+        echo "-----------------------------Buildinfo---------------------------------------------"
+        ./scripts/diffconfig.sh > seed.config
+        cat seed.config
         make download -j8 || make download -j1 V=s 
         rm -rf $(find ./dl/ -size -1024c)
         du -h --max-depth=1*
