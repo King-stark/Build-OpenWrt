@@ -31,3 +31,7 @@ rm -rf feeds/kenzo/luci-app-pushbot
 # 自定义添加额外软件包
 # 甜糖心愿自动收集
 svn co https://github.com/jerrykuku/luci-app-ttnode/trunk package/luci-app-ttnode
+
+# Update feeds
+./scripts/feeds update -a
+./scripts/feeds install -a
