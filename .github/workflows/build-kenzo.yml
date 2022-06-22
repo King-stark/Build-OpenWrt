@@ -140,7 +140,7 @@ jobs:
         cat seed.config
         make download -j8 || make download -j1 V=s 
         rm -rf $(find ./dl/ -size -1024c)
-        du -h --max-depth=1*
+        df -Th
 
     - name: Compile the firmware
       id: compile
