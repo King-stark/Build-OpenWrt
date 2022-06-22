@@ -104,8 +104,8 @@ jobs:
     - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a
 
-    - name: Install feeds
-      run: cd openwrt && ./scripts/feeds install -a
+#    - name: Install feeds
+#      run: cd openwrt && ./scripts/feeds install -a
 
     - name: Load custom configuration
       run: |
@@ -114,6 +114,12 @@ jobs:
         chmod +x $DIY_P2_SH
         cd openwrt
         $GITHUB_WORKSPACE/$DIY_P2_SH
+
+    - name: 下载预置文件
+      run: |
+        cd openwrt
+        wget http://193.123.239.65:39995/lede/build_dir.tar.gz && tar -zxf build_dir.tar.gz
+        wget http://193.123.239.65:39995/dl.tar.gz && tar -zxf dl.tar.gz
 
     - name: SSH connection to Actions
       uses: P3TERX/ssh2actions@v1.0.0
