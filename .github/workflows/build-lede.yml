@@ -84,7 +84,7 @@ jobs:
         useVersionInfo=$(git show -s --date=short --format="Author: %an<br/>date: %cd<br/>commit: %s<br/>commit hash: %H")
         echo "useVersionInfo=$useVersionInfo" >> $GITHUB_ENV
         echo "DATE=$(date "+%Y-%m-%d %H:%M:%S")" >> $GITHUB_ENV
-        echo "DATE1=$(date "+%Y-%m-%d")" >> $GITHUB_ENV
+        echo "DATE1=$(date "+%m/%d %Y")" >> $GITHUB_ENV
 
     - name: Cache Toolchain
       uses: klever1988/cachewrtbuild@main
@@ -172,9 +172,9 @@ jobs:
       if: steps.organize.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
       uses: ncipollo/release-action@v1
       with:
-        name: R${{ env.DATE }} for ${{ env.PRODUCT_NAME }}
+        name: ${{ env.DATE1 }} ${{ env.PRODUCT_NAME }}
         allowUpdates: true
-        tag: ${{ env.PRODUCT_NAME }}
+        tag: ${{ env.PRODUCT_NAME }}_${{ env.DATE }}
         commit: main
         token: ${{ secrets.TOKEN }}
         artifacts: ${{ env.FIRMWARE }}/*
