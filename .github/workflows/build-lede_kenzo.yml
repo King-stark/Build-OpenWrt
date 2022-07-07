@@ -8,7 +8,7 @@
 # Description: Build OpenWrt using GitHub Actions
 #
 
-name: Build kenzo
+name: Build lede_kenzo
 
 on:
   repository_dispatch:
@@ -23,16 +23,15 @@ env:
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
   FEEDS_CONF: feeds.conf.default
-  CONFIG_FILE: .config
+  CONFIG_FILE: kenzo-n1-config
   DIY_P1_SH: diy-kenzok1.sh
   DIY_P2_SH: diy-kenzok2.sh
   UPLOAD_BIN_DIR: true
   UPLOAD_FIRMWARE: false
-  UPLOAD_MUSETRANSFER: true
-  UPLOAD_WETRANSFER: true
-  UPLOAD_RELEASE: false
+  UPLOAD_RELEASE: true
+  SERVERCHAN_PUSH: true
   TZ: Asia/Shanghai
-  PRODUCT_NAME: N1_kenzo-openWRT
+  PRODUCT_NAME: lede_kenzo-openWRT
 
 jobs:
   build:
@@ -60,6 +59,15 @@ jobs:
         echo "硬盘详情："
         df -Th
 
+    - name: Telegram notification
+      if: env.SERVERCHAN_PUSH == 'true'
+      run: |
+        cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c > CPU
+        cat /proc/cpuinfo | grep "cpu cores" | uniq >> CPU
+        sed -i 's|[[:space:]]||g; s|^.||' CPU && sed -i 's|CPU||g; s|pucores:||' CPU
+        CPUNAME="$(awk 'NR==1' CPU)" && CPUCORES="$(awk 'NR==2' CPU)"
+        curl -k --data chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" --data "text=🔔 您正在使用【${CPUNAME} CPU】【${CPUCORES}核心】编译固件中,请耐心等待...... ⏳" "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
+
     - name: Initialization environment
       env:
         DEBIAN_FRONTEND: noninteractive
@@ -67,7 +75,7 @@ jobs:
         sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /etc/mysql /etc/php /usr/local/lib/android /opt/ghc
         sudo -E apt-get -y purge azure-cli ghc* zulu* hhvm llvm* firefox google* dotnet* powershell openjdk* adoptopenjdk* mysql* php* mongodb* dotnet* moby* snapd* || true
         sudo -E apt-get -qq update
-        sudo -E apt-get -qq install $(curl -fsSL https://raw.githubusercontent.com/King-stark/Build-OpenWrt/main/depends/depends-ubuntu-2204)
+        sudo -E apt-get -qq install $(curl -fsSL https://raw.githubusercontent.com/King-stark/Build-OpenWrt/main/depends/depends-lede)
         sudo -E apt-get -qq autoremove --purge
         sudo -E apt-get -qq clean
         sudo timedatectl set-timezone "$TZ"
@@ -82,7 +90,7 @@ jobs:
         git clone $REPO_URL -b $REPO_BRANCH openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
         cd openwrt
-        useVersionInfo=$(git show -s --date=short --format="Author: %an</br>date: %cd</br>commit: %s</br>commit hash: %H")
+        useVersionInfo=$(git show -s --date=short --format="Author: %an<br/>date: %cd<br/>commit: %s<br/>commit hash: %H")
         echo "useVersionInfo=$useVersionInfo" >> $GITHUB_ENV
         echo "DATE=$(date "+%Y-%m-%d %H:%M:%S")" >> $GITHUB_ENV
         echo "DATE1=$(date "+%Y-%m-%d")" >> $GITHUB_ENV
@@ -104,24 +112,16 @@ jobs:
     - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a
 
-#    - name: Install feeds
-#      run: cd openwrt && ./scripts/feeds install -a
+    - name: Install feeds
+      run: cd openwrt && ./scripts/feeds install -a
 
     - name: Load custom configuration
       run: |
-
+        [ -e files ] && mv files openwrt/files
+        [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
         chmod +x $DIY_P2_SH
         cd openwrt
         $GITHUB_WORKSPACE/$DIY_P2_SH
-        cd ..
-        [ -e files ] && mv files openwrt/files
-        [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
-
-    - name: 下载预置文件
-      run: |
-        cd openwrt
-        wget http://193.123.239.65:39995/lede/build_dir.tar.gz && tar -zxf build_dir.tar.gz && rm build_dir.tar.gz
-        wget http://193.123.239.65:39995/dl.tar.gz && tar -zxf dl.tar.gz && rm dl.tar.gz
 
     - name: SSH connection to Actions
       uses: P3TERX/ssh2actions@v1.0.0
@@ -135,12 +135,9 @@ jobs:
       run: |
         cd openwrt
         make defconfig
-        echo "-----------------------------Buildinfo---------------------------------------------"
-        ./scripts/diffconfig.sh > seed.config
-        cat seed.config
         make download -j8 || make download -j1 V=s 
         rm -rf $(find ./dl/ -size -1024c)
-        df -Th
+        df -hT
 
     - name: Compile the firmware
       id: compile
@@ -166,8 +163,12 @@ jobs:
 
     - name: Organize files
       id: organize
+      if: steps.compile.outputs.status == 'success' && !cancelled()
       run: |
-        cd openwrt/bin/targets/*/*
+        cd $GITHUB_WORKSPACE/openwrt/bin/packages
+        tar -zcvf Packages.tar.gz ./*
+        cp Packages.tar.gz $GITHUB_WORKSPACE/openwrt/bin/targets/*/*
+        cd $GITHUB_WORKSPACE/openwrt/bin/targets/*/*
         rm -rf packages
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
         echo "::set-output name=status::success"
@@ -179,47 +180,13 @@ jobs:
         name: OpenWrt_firmware${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
         path: ${{ env.FIRMWARE }}
 
-    - name: Package Armvirt as OpenWrt
-      uses: unifreq/openwrt_packit@master
-      if: steps.organize.outputs.status == 'success' && !cancelled()
-      env:
-        OPENWRT_ARMVIRT: openwrt/bin/targets/*/*/*.tar.gz
-        PACKAGE_SOC: s905d
-        WHOAMI: king-stark/github
-        KERNEL_VERSION_NAME: 5.4.188_5.15.44_5.17.12
-        KERNEL_AUTO_LATEST: true
-        #OPENWRT_VER: R21.7.26
-        #ENABLE_WIFI_K504: 1
-        #ENABLE_WIFI_K510: 0
-
-    - name: Upload firmware to Musetransfer
-      id: musetransfer
-      if: env.PACKAGED_STATUS == 'success' && env.UPLOAD_MUSETRANSFER == 'true' && !cancelled()
-      run: |
-        curl -fsSL git.io/file-transfer | sh
-        ./transfer muse -s -p 64 --no-progress ${PACKAGED_OUTPUTPATH} 2>&1 | tee Musetransfer.log
-        echo "::warning file=Musetransfer.com::$(cat Musetransfer.log | grep https)"
-        echo "::set-output name=url::$(cat Musetransfer.log | grep https | cut -f3 -d" ")"
-
-    - name: Upload firmware to WeTransfer
-      id: wetransfer
-      if: env.PACKAGED_STATUS == 'success' && env.UPLOAD_WETRANSFER == 'true' && !cancelled()
-      run: |
-        curl -fsSL git.io/file-transfer | sh
-        ./transfer wet -s -p 16 --no-progress ${FIRMWARE} 2>&1 | tee wetransfer.log
-        echo "::warning file=wetransfer.com::$(cat wetransfer.log | grep https)"
-        echo "::set-output name=url::$(cat wetransfer.log | grep https | cut -f3 -d" ")"
-
     - name: Generate release tag
       id: tag
-      if: env.PACKAGED_STATUS == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
+      if: steps.organizer.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true'
       run: |
-        echo "::set-output name=release_tag::$(date +"%Y.%m.%d-%H%M")"
         touch release.txt
-        [ $UPLOAD_MUSETRANSFER = true ] && echo "🔗 [Musetransfer](${{ steps.musetransfer.outputs.url }})" >> release.txt
-        [ $UPLOAD_WETRANSFER = true ] && echo "🔗 [WeTransfer](${{ steps.wetransfer.outputs.url }})" >> release.txt
         cat >> release.txt <<EOF
-        This is OpenWrt firmware for Armvirt 64
+        This is OpenWrt Rootfs firmware for Armvirt 64
         * Firmware information
         Default IP: 192.168.31.2
         Default username: root
@@ -228,20 +195,22 @@ jobs:
         echo "::set-output name=status::success"
     
     - name: Upload firmware to release
-      uses: softprops/action-gh-release@v1
-      if: steps.tag.outputs.status == 'success' && !cancelled()
-      env:
-        GITHUB_TOKEN: ${{ secrets.TOKEN }}
+      if: steps.organize.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
+      uses: ncipollo/release-action@v1
       with:
-        tag_name: ${{ steps.tag.outputs.release_tag }}
-        body_path: release.txt
-        files: ${{ env.PACKAGED_OUTPUTPATH }}/*
+        name: R${{ env.DATE }} for ${{ env.PRODUCT_NAME }}
+        allowUpdates: true
+        tag: ${{ env.PRODUCT_NAME }}
+        commit: main
+        token: ${{ secrets.TOKEN }}
+        artifacts: ${{ env.FIRMWARE }}/*
+        bodyFile: release.txt
 
     - name: Delete workflow runs
       uses: GitRML/delete-workflow-runs@main
       with:
-        retain_days: 3
-        keep_minimum_runs: 3
+        retain_days: 30
+        keep_minimum_runs: 6
 
     - name: Remove old Releases
       uses: dev-drprasad/delete-older-releases@v0.1.0
@@ -264,9 +233,8 @@ jobs:
     - name: Telegram notification
       run: |
         MSG="
+        亲爱的✨主人✨：
         ${{ env.PRODUCT_NAME }} 编译完成
-        🔗 [Musetransfer](${{ steps.musetransfer.outputs.url }})
-        🔗 [WeTransfer](${{ steps.wetransfer.outputs.url }})
         编译时间：${{ env.DATE }}
         OpenWrt 更新信息：${{ env.useVersionInfo }}
         
