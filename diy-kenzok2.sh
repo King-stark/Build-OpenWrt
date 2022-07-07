@@ -19,14 +19,15 @@ sed -i 's/luci-theme-bootstrap/luci-theme-argon/' feeds/luci/collections/luci/Ma
 # kenzok8: https://github.com/kenzok8/openwrt-packages
 
 # lede ./feeds/luci
+rm -rf feeds/luci/applications/luci-app-aliyundrive-webdav
 rm -rf feeds/luci/applications/luci-app-diskman
 rm -rf feeds/luci/applications/luci-app-dockerman
+rm -rf feeds/luci/applications/luci-app-pushbot
 rm -rf feeds/luci/applications/luci-app-serverchan
 
 # kenzok8 ./feeds/kenzo
-rm -rf feeds/kenzo/luci-app-aliyundrive-webdav
-rm -rf feeds/kenzo/luci-app-easymesh
-rm -rf feeds/kenzo/luci-app-pushbot
+# rm -rf feeds/kenzo/luci-app-aliyundrive-webdav
+# rm -rf feeds/kenzo/luci-app-easymesh
 
 # 自定义添加额外软件包
 # 甜糖心愿自动收集
