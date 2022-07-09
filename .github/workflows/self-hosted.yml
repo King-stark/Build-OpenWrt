@@ -49,15 +49,20 @@ jobs:
         echo "硬盘详情："
         df -Th /
 
+    - name: Initialization environment
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo mkdir -p /workdir
+        sudo chown $USER:$GROUPS /workdir 
+        df -Th
+
     - name: Telegram notification
       if: env.SERVERCHAN_PUSH == 'true'
       run: |
-        df -Th / >> Devinfo
-        echo "Devinfo=$Devinfo" >> $GITHUB_ENV
         MSG="
         🔔 您正在使用 托管的甲骨文 编译固件中,请耐心等待...... ⏳
         编译时间：${{ env.DATE }}
-        runner信息：${{ env.Devinfo }}
         " 
         curl -k --data chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" --data "text=${MSG}" "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
 
