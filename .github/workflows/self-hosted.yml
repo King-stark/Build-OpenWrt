@@ -52,8 +52,8 @@ jobs:
     - name: Telegram notification
       if: env.SERVERCHAN_PUSH == 'true'
       run: |
-        Devinfo=$(df -Th /)
-        echo "Devinfo=$Devinfo" >> $GITHUB_ENV
+        df -Th / >> Devinfo
+        echo "Devinfo=$(cat Devinfo)" >> $GITHUB_ENV
         MSG="
         🔔 您正在使用 托管的甲骨文 编译固件中,请耐心等待...... ⏳
         编译时间：${{ env.DATE }}
