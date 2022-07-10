@@ -193,6 +193,8 @@ jobs:
         Default IP: 192.168.31.2
         Default username: root
         Default password: password
+        当前使用版本:【截止编译前[➦lede源码](https://github.com/coolsnowwolf/lede) [kenzok8的常用openwrt软件包](https://github.com/kenzok8/openwrt-packages.git)最后一次更新记录】
+        ${{ env.useVersionInfo }}
         EOF
         echo "::set-output name=status::success"
     
