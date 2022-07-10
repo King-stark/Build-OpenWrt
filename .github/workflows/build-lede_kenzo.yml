@@ -112,16 +112,16 @@ jobs:
     - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a
 
-    - name: Install feeds
-      run: cd openwrt && ./scripts/feeds install -a
+#    - name: Install feeds
+#      run: cd openwrt && ./scripts/feeds install -a
 
     - name: Load custom configuration
       run: |
-        [ -e files ] && mv files openwrt/files
-        [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
         chmod +x $DIY_P2_SH
         cd openwrt
         $GITHUB_WORKSPACE/$DIY_P2_SH
+        [ -e files ] && mv files openwrt/files
+        [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
 
     - name: SSH connection to Actions
       uses: P3TERX/ssh2actions@v1.0.0
@@ -135,6 +135,7 @@ jobs:
       run: |
         cd openwrt
         make defconfig
+        cat .config|grep luci-app-* 
         make download -j8 || make download -j1 V=s 
         rm -rf $(find ./dl/ -size -1024c)
         df -hT
@@ -221,15 +222,6 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.TOKEN }}
 
-#    - name: Telegram notification
-#      uses: appleboy/telegram-action@master
-#      with:
-#        to: ${{ secrets.TELEGRAM_CHAT_ID }}
-#        token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-#        message: |
-#          编译完成
-#          打包时间：${{ env.DATE }}
-#          更新信息：${{ env.useVersionInfo }}
     - name: Telegram notification
       run: |
         MSG="
