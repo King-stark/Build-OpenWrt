@@ -185,7 +185,7 @@ jobs:
 
     - name: Generate release tag
       id: tag
-      if: steps.organizer.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true'
+      if: steps.organize.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true'
       run: |
         touch release.txt
         cat >> release.txt <<EOF
