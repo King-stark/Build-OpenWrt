@@ -49,14 +49,6 @@ jobs:
         echo "硬盘详情："
         df -Th /
 
-    - name: Initialization environment
-      env:
-        DEBIAN_FRONTEND: noninteractive
-      run: |
-        sudo mkdir -p /workdir
-        sudo chown $USER:$GROUPS /workdir 
-        df -Th
-
     - name: Telegram notification
       if: env.SERVERCHAN_PUSH == 'true'
       run: |
@@ -67,7 +59,6 @@ jobs:
         curl -k --data chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" --data "text=${MSG}" "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
 
     - name: Clone source code
-      working-directory: /workdir
       run: |
         df -hT $PWD
         git clone $REPO_URL -b $REPO_BRANCH openwrt
