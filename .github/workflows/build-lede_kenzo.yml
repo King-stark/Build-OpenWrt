@@ -200,7 +200,7 @@ jobs:
       with:
         name: R${{ env.DATE1 }} ${{ env.PRODUCT_NAME }}
         allowUpdates: true
-        tag: ${{ env.PRODUCT_NAME }}_${{ env.DATE }}
+        tag: ${{ env.PRODUCT_NAME }}
         commit: main
         token: ${{ secrets.TOKEN }}
         artifacts: ${{ env.FIRMWARE }}/*
