@@ -135,7 +135,8 @@ jobs:
       run: |
         cd openwrt
         make defconfig
-        cat .config|grep luci-app-* 
+        ./scripts/diffconfig.sh > seed.config
+        cat seed.config
         make download -j8 || make download -j1 V=s 
         rm -rf $(find ./dl/ -size -1024c)
         df -hT
