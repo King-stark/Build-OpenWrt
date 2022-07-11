@@ -27,7 +27,7 @@ env:
   DIY_P2_SH: diy-part2.sh
   UPLOAD_FIRMWARE: false
   UPLOAD_RELEASE: true
-  UPLOAD_WENSHUSHU: true
+  UPLOAD_WENSHUSHU: false
   UPLOAD_WETRANSFER: true
   RECENT_LASTEST: 30
   TZ: Asia/Shanghai
