@@ -88,11 +88,11 @@ jobs:
         TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
 
     - name: Upload firmware to Wenshushu
-      id: Wenshushu
+      id: wenshushu
       if: env.PACKAGED_STATUS == 'success' && env.UPLOAD_WENSHUSHU == 'true' && !cancelled()
       run: |
         curl -fsSL git.io/file-transfer | sh
-        ./transfer wss -s -p 32 --no-progress ${PACKAGED_OUTPUTPATH} 2>&1 | tee Wenshushu.log
+        ./transfer wss -s -p 16 --no-progress ${PACKAGED_OUTPUTPATH} 2>&1 | tee Wenshushu.log
         echo "::warning file=Wenshushu.cn::$(cat Wenshushu.log | grep https)"
         echo "::set-output name=url::$(cat Wenshushu.log | grep https | cut -f3 -d" ")"
 
@@ -111,6 +111,24 @@ jobs:
       with:
         path: ${{ env.PACKAGED_OUTPUTPATH }}/
 
+    - name: Generate release tag
+      id: tag
+      if: env.PACKAGED_STATUS == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
+      run: |
+        touch release.txt
+        [ $UPLOAD_WENSHUSHU = true ] && echo "🔗 [Wenshushu](${{ steps.wenshushu.outputs.url }})" >> release.txt
+        [ $UPLOAD_WETRANSFER = true ] && echo "🔗 [WeTransfer](${{ steps.wetransfer.outputs.url }})" >> release.txt
+        cat >> release.txt <<EOF
+        - 🔗 [Wenshushu](${{ steps.wenshushu.outputs.url }})
+        - 🔗 [WeTransfer](${{ steps.wetransfer.outputs.url }})
+        - 使用lede源码和kenzok8的常用软件包合集自动编译而成高大全。
+        - 默认IP：192.168.31.2 默认密码：password (WiFi密码同）
+        - 常见问题及注意事项请参考恩山F大➦[最新帖](https://www.right.com.cn/forum/thread-4076037-1-1.html)
+        - 当前使用版本:【编译前的最后一次➦[主源码](https://github.com/coolsnowwolf/lede)更新记录】
+        ${{ env.useVersionInfo }}
+        EOF
+        echo "::set-output name=status::success"
+
     - name: Upload OpenWrt Firmware to Release
       id: release
       uses: ncipollo/release-action@v1
@@ -123,14 +141,7 @@ jobs:
         commit: main
         token: ${{ secrets.TOKEN }}
         artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
-        body: |
-          - 🔗 [Wenshushu](${{ steps.Wenshushu.outputs.url }})
-          - 🔗 [WeTransfer](${{ steps.wetransfer.outputs.url }})
-          - 使用lede源码和kenzok8的常用软件包合集自动编译而成高大全。
-          - 默认IP：192.168.31.2 默认密码：password (WiFi密码同）
-          - 常见问题及注意事项请参考恩山F大➦[最新帖](https://www.right.com.cn/forum/thread-4076037-1-1.html)
-          - 当前使用版本:【编译前的最后一次➦[主源码](https://github.com/coolsnowwolf/lede)更新记录】
-          ${{ env.useVersionInfo }}
+        bodyFile: release.txt
 
     - name: Delete workflow runs
       uses: GitRML/delete-workflow-runs@main
@@ -154,7 +165,10 @@ jobs:
         MSG="
         ${{ env.PRODUCT_NAME }} 打包完成
         打包时间：${{ env.DATE }}
-        🔗下载链接：https://github.com/King-stark/Build-OpenWrt/releases/download/N1-openWRT
+        下载链接：
+        🔗 [Release](https://github.com/King-stark/Build-OpenWrt/releases/tag/N1-openWRT)
+        🔗 [Wenshushu](${{ steps.Wenshushu.outputs.url }})
+        🔗 [WeTransfer](${{ steps.wetransfer.outputs.url }})
         OpenWrt 更新信息：${{ env.useVersionInfo }}
         "
         curl "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}&text=${MSG}"
