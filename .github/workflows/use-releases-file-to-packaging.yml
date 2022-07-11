@@ -27,7 +27,7 @@ env:
   DIY_P2_SH: diy-part2.sh
   UPLOAD_FIRMWARE: false
   UPLOAD_RELEASE: true
-  UPLOAD_MUSETRANSFER: true
+  UPLOAD_WENSHUSHU: true
   UPLOAD_WETRANSFER: true
   RECENT_LASTEST: 30
   TZ: Asia/Shanghai
@@ -87,6 +87,24 @@ jobs:
         TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
 
+    - name: Upload firmware to Wenshushu
+      id: Wenshushu
+      if: env.PACKAGED_STATUS == 'success' && env.UPLOAD_WENSHUSHU == 'true' && !cancelled()
+      run: |
+        curl -fsSL git.io/file-transfer | sh
+        ./transfer wss -s -p 32 --no-progress ${PACKAGED_OUTPUTPATH} 2>&1 | tee Wenshushu.log
+        echo "::warning file=Wenshushu.cn::$(cat Wenshushu.log | grep https)"
+        echo "::set-output name=url::$(cat Wenshushu.log | grep https | cut -f3 -d" ")"
+
+    - name: Upload firmware to WeTransfer
+      id: wetransfer
+      if: env.PACKAGED_STATUS == 'success' && env.UPLOAD_WETRANSFER == 'true' && !cancelled()
+      run: |
+        curl -fsSL git.io/file-transfer | sh
+        ./transfer wet -s -p 16 --no-progress ${PACKAGED_OUTPUTPATH} 2>&1 | tee wetransfer.log
+        echo "::warning file=wetransfer.com::$(cat wetransfer.log | grep https)"
+        echo "::set-output name=url::$(cat wetransfer.log | grep https | cut -f3 -d" ")"
+
     - name: Upload artifact to Actions
       uses: kittaakos/upload-artifact-as-is@master
       if: env.PACKAGED_STATUS == 'success' && env.UPLOAD_FIRMWARE == 'true' && !cancelled()
@@ -98,7 +116,7 @@ jobs:
       uses: ncipollo/release-action@v1
       if: env.PACKAGED_STATUS == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
       with:
-        name: R${{ env.DATE1 }} ${{ env.PRODUCT_NAME }}
+        name: ${{ env.DATE1 }} ${{ env.PRODUCT_NAME }}
         allowUpdates: true
         removeArtifacts: true
         tag: ${{ env.PRODUCT_NAME }}
@@ -106,29 +124,13 @@ jobs:
         token: ${{ secrets.TOKEN }}
         artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
         body: |
+          - 🔗 [Wenshushu](${{ steps.Wenshushu.outputs.url }})
+          - 🔗 [WeTransfer](${{ steps.wetransfer.outputs.url }})
           - 使用lede源码和kenzok8的常用软件包合集自动编译而成高大全。
           - 默认IP：192.168.31.2 默认密码：password (WiFi密码同）
           - 常见问题及注意事项请参考恩山F大➦[最新帖](https://www.right.com.cn/forum/thread-4076037-1-1.html)
           - 当前使用版本:【编译前的最后一次➦[主源码](https://github.com/coolsnowwolf/lede)更新记录】
           ${{ env.useVersionInfo }}
-
-    - name: Upload firmware to Musetransfer
-      id: musetransfer
-      if: env.PACKAGED_STATUS == 'success' && env.UPLOAD_MUSETRANSFER == 'true' && !cancelled()
-      run: |
-        curl -fsSL git.io/file-transfer | sh
-        ./transfer muse -s -p 64 --no-progress ${PACKAGED_OUTPUTPATH} 2>&1 | tee Musetransfer.log
-        echo "::warning file=Musetransfer.com::$(cat Musetransfer.log | grep https)"
-        echo "::set-output name=url::$(cat Musetransfer.log | grep https | cut -f3 -d" ")"
-
-    - name: Upload firmware to WeTransfer
-      id: wetransfer
-      if: env.PACKAGED_STATUS == 'success' && env.UPLOAD_WETRANSFER == 'true' && !cancelled()
-      run: |
-        curl -fsSL git.io/file-transfer | sh
-        ./transfer wet -s -p 16 --no-progress ${FIRMWARE} 2>&1 | tee wetransfer.log
-        echo "::warning file=wetransfer.com::$(cat wetransfer.log | grep https)"
-        echo "::set-output name=url::$(cat wetransfer.log | grep https | cut -f3 -d" ")"
 
     - name: Delete workflow runs
       uses: GitRML/delete-workflow-runs@main
@@ -152,6 +154,7 @@ jobs:
         MSG="
         ${{ env.PRODUCT_NAME }} 打包完成
         打包时间：${{ env.DATE }}
+        🔗下载链接：https://github.com/King-stark/Build-OpenWrt/releases/download/N1-openWRT
         OpenWrt 更新信息：${{ env.useVersionInfo }}
         "
         curl "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}&text=${MSG}"
