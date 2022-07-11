@@ -228,7 +228,7 @@ jobs:
     - name: Telegram notification
       run: |
         MSG="
-        亲爱的✨主人✨：
+        🔔 亲爱的✨主人✨：
         ${{ env.PRODUCT_NAME }} 编译完成
         编译时间：${{ env.DATE }}
         OpenWrt 更新信息：${{ env.useVersionInfo }}
