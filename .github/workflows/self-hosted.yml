@@ -17,7 +17,7 @@ env:
   DIY_P1_SH: diy-kenzok1.sh
   DIY_P2_SH: diy-kenzok2.sh
   UPLOAD_BIN_DIR: false
-  UPLOAD_FIRMWARE: true
+  UPLOAD_FIRMWARE: false
   UPLOAD_RELEASE: true
   SERVERCHAN_PUSH: true
   TZ: Asia/Shanghai
@@ -126,7 +126,20 @@ jobs:
       with:
         name: OpenWrt_firmware${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
         path: ${{ env.FIRMWARE }}
-  
+
+    - name: Package Armvirt as OpenWrt
+      uses: unifreq/openwrt_packit@master
+      if: steps.organize.outputs.status == 'success' && !cancelled()
+      env:
+        OPENWRT_ARMVIRT: openwrt/bin/targets/*/*/*.tar.gz
+        PACKAGE_SOC: s905d
+        WHOAMI: king-stark
+        KERNEL_VERSION_NAME: 5.15.53_5.18.10
+        KERNEL_AUTO_LATEST: true
+        #OPENWRT_VER: R21.7.26
+        #ENABLE_WIFI_K504: 1
+        #ENABLE_WIFI_K510: 0
+
     - name: Upload firmware to release
       if: steps.organize.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
       uses: ncipollo/release-action@v1
@@ -136,11 +149,14 @@ jobs:
         tag: ${{ env.PRODUCT_NAME }}
         commit: main
         token: ${{ secrets.TOKEN }}
-        artifacts: ${{ env.FIRMWARE }}/*
+        artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
         body: |
-          - 这是底包，非完整固件，定时自动编译
-          - 默认IP：192.168.31.2 默认密码：password
-          - 当前使用版本:【编译前的最后一次[➦lede源码](https://github.com/coolsnowwolf/lede)更新记录】
+          - This is OpenWrt mini-firmware for Armvirt 64
+          - ***Firmware information***
+          - Default IP: 192.168.31.2
+          - Default username: root
+          - Default password: password
+          - 当前使用版本:【截止编译前[➦lede源码](https://github.com/coolsnowwolf/lede) ➦[kenzok8的常用openwrt软件包](https://github.com/kenzok8/openwrt-packages.git) 最后一次更新】
           ${{ env.useVersionInfo }}
 
     - name: Delete workflow runs
