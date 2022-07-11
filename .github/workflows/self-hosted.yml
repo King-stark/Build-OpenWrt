@@ -31,15 +31,6 @@ jobs:
     - name: Checkout
       uses: actions/checkout@main
 
-    - name: Telegram notification
-      if: env.SERVERCHAN_PUSH == 'true'
-      run: |
-        MSG="
-        🔔 您正在使用 托管的甲骨文 编译固件中,请耐心等待...... ⏳
-        编译时间：${{ env.DATE }}
-        " 
-        curl -k --data chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" --data "text=${MSG}" "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
-
     - name: Clone source code
       run: |
         df -hT $PWD
@@ -50,6 +41,16 @@ jobs:
         echo "useVersionInfo=$useVersionInfo" >> $GITHUB_ENV
         echo "DATE=$(date "+%Y-%m-%d %H:%M:%S")" >> $GITHUB_ENV
         echo "DATE1=$(date "+%m/%d %Y")" >> $GITHUB_ENV
+
+    - name: Telegram notification
+      if: env.SERVERCHAN_PUSH == 'true'
+      run: |
+        MSG="
+        🔔 您正在使用 托管的甲骨文 编译固件中,请耐心等待...... ⏳
+        编译时间：${{ env.DATE }}
+        
+        " 
+        curl -k --data chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" --data "text=${MSG}" "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
 
     - name: Load custom feeds
       run: |
@@ -179,9 +180,9 @@ jobs:
       run: |
         MSG="
         亲爱的✨主人✨：
+        ${{ env.PRODUCT_NAME }} 编译并打包完成
         编译时间：${{ env.DATE }}
+        🔗下载链接：https://github.com/King-stark/Build-OpenWrt/releases/download/lede-kenzo-mini
         OpenWrt 更新信息：${{ env.useVersionInfo }}
-        ${{ env.PRODUCT_NAME }} 编译完成
-        
         "
         curl "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}&text=${MSG}"
