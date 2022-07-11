@@ -163,6 +163,7 @@ jobs:
     - name: Telegram notification
       run: |
         MSG="
+        🔔 亲爱的✨主人✨：
         ${{ env.PRODUCT_NAME }} 打包完成
         打包时间：${{ env.DATE }}
         下载链接：
