@@ -48,7 +48,7 @@ jobs:
         MSG="
         🔔 您正在使用 托管的甲骨文 编译固件中,请耐心等待...... ⏳
         编译时间：${{ env.DATE }}
-        
+        编译信息：${{ env.PRODUCT_NAME }}
         " 
         curl -k --data chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" --data "text=${MSG}" "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
 
