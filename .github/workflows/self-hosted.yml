@@ -21,7 +21,7 @@ env:
   UPLOAD_RELEASE: true
   SERVERCHAN_PUSH: true
   TZ: Asia/Shanghai
-  PRODUCT_NAME: kenzo-lede-mini
+  PRODUCT_NAME: lede-kenzo-mini
 
 jobs:
   build:
