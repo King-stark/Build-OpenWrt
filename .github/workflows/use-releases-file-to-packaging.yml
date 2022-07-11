@@ -165,9 +165,9 @@ jobs:
         ${{ env.PRODUCT_NAME }} 打包完成
         打包时间：${{ env.DATE }}
         下载链接：
-        🔗 [Release](https://github.com/King-stark/Build-OpenWrt/releases/tag/N1-openWRT)
-        🔗 [Wenshushu](${{ steps.Wenshushu.outputs.url }})
-        🔗 [WeTransfer](${{ steps.wetransfer.outputs.url }})
+        🔗 [Github]：https://github.com/King-stark/Build-OpenWrt/releases/tag/N1-openWRT
+        🔗 [Wenshushu]：${{ steps.Wenshushu.outputs.url }}
+        🔗 [WeTransfer]：${{ steps.wetransfer.outputs.url }}
         OpenWrt 更新信息：${{ env.useVersionInfo }}
         "
         curl "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}&text=${MSG}"
