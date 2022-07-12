@@ -26,7 +26,7 @@ env:
   DIY_P1_SH: diy-part1.sh
   DIY_P2_SH: diy-part2.sh
   UPLOAD_FIRMWARE: false
-  UPLOAD_RELEASE: false
+  UPLOAD_RELEASE: true
   UPLOAD_WENSHUSHU: false
   UPLOAD_WETRANSFER: true
   RECENT_LASTEST: 30
@@ -71,7 +71,7 @@ jobs:
       if: (!cancelled())
       uses: ophub/flippy-openwrt-actions@main
       env:
-        OPENWRT_ARMVIRT: https://download.wetransfer.com/usgv/523cefa43c4d8f322aa177910ea6b34a20220712140332/db9353a34927b06d10b91515b69f5be50c5774c6/openwrt-armvirt-64-default-rootfs.tar.gz?token=eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NTc2MzQ5MzIsImV4cCI6MTY1NzYzNTUzMiwidW5pcXVlIjoiNTIzY2VmYTQzYzRkOGYzMjJhYTE3NzkxMGVhNmIzNGEyMDIyMDcxMjE0MDMzMiIsImZpbGVuYW1lIjoib3BlbndydC1hcm12aXJ0LTY0LWRlZmF1bHQtcm9vdGZzLnRhci5neiIsIndheWJpbGxfdXJsIjoiaHR0cDovL3N0b3JtLWludGVybmFsLnNlcnZpY2UudXMtZWFzdC0xLndldHJhbnNmZXIubmV0L2FwaS93YXliaWxscz9zaWduZWRfd2F5YmlsbF9pZD1leUpmY21GcGJITWlPbnNpYldWemMyRm5aU0k2SWtKQmFITkxkMk14VFRKMWJpSXNJbVY0Y0NJNklqSXdNakl0TURjdE1USlVNVFU2TVRnNk5USXVNREF3V2lJc0luQjFjaUk2SW5kaGVXSnBiR3hmYVdRaWZYMC0tMjFjNWI1MzY1NTgwNDdlOTk4YjEyNDhiZWMyZGQ2MThhZTYxNzc1MzY0MTQ0ODNjZTdiNDFmNGIzNGQzZDYyNCIsImZpbmdlcnByaW50IjoiZGI5MzUzYTM0OTI3YjA2ZDEwYjkxNTE1YjY5ZjViZTUwYzU3NzRjNiIsImNhbGxiYWNrIjoie1wiZm9ybWRhdGFcIjp7XCJhY3Rpb25cIjpcImh0dHA6Ly9mcm9udGVuZC5zZXJ2aWNlLmV1LXdlc3QtMS53ZXRyYW5zZmVyLm5ldC93ZWJob29rcy9iYWNrZW5kXCJ9LFwiZm9ybVwiOntcInRyYW5zZmVyX2lkXCI6XCI1MjNjZWZhNDNjNGQ4ZjMyMmFhMTc3OTEwZWE2YjM0YTIwMjIwNzEyMTQwMzMyXCIsXCJkb3dubG9hZF9pZFwiOjE1ODMzMDYxMjc1fX0ifQ.hsvrLfgQQ54Om7qj4OgCNLfKW-L9NEp9dPPOJth1P7Y&cf=y
+        OPENWRT_ARMVIRT: https://github.com/King-stark/Build-OpenWrt/releases/download/lede-kenzo/openwrt-armvirt-64-default-rootfs.tar.gz
         PACKAGE_SOC: s905d
         WHOAMI: king-stark
         #KERNEL_REPO_URL: https://github.com/breakings/OpenWrt/tree/main/opt/kernel
