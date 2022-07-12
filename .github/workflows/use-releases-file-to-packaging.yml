@@ -71,7 +71,7 @@ jobs:
       if: (!cancelled())
       uses: ophub/flippy-openwrt-actions@main
       env:
-        OPENWRT_ARMVIRT: https://cdn-122.anonfiles.com/h7YcXewcyd/7a35b275-1657609379/openwrt-armvirt-64-default-rootfs.tar.gz
+        OPENWRT_ARMVIRT: https://download.wetransfer.com/usgv/268568cb31a09ee62a7456ef6a9e0b5320220712131509/3437f9c500de188b2b7e6c88a719811981eb77ad/openwrt-armvirt-64-default-rootfs.tar.gz?token=eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NTc2MzE3NzIsImV4cCI6MTY1NzYzMjM3MiwidW5pcXVlIjoiMjY4NTY4Y2IzMWEwOWVlNjJhNzQ1NmVmNmE5ZTBiNTMyMDIyMDcxMjEzMTUwOSIsImZpbGVuYW1lIjoib3BlbndydC1hcm12aXJ0LTY0LWRlZmF1bHQtcm9vdGZzLnRhci5neiIsIndheWJpbGxfdXJsIjoiaHR0cDovL3N0b3JtLWludGVybmFsLnNlcnZpY2UudXMtZWFzdC0xLndldHJhbnNmZXIubmV0L2FwaS93YXliaWxscz9zaWduZWRfd2F5YmlsbF9pZD1leUpmY21GcGJITWlPbnNpYldWemMyRm5aU0k2SWtKQmFITkxkMk5pYUZkWGJpSXNJbVY0Y0NJNklqSXdNakl0TURjdE1USlVNVFE2TWpZNk1USXVNREF3V2lJc0luQjFjaUk2SW5kaGVXSnBiR3hmYVdRaWZYMC0tOTQ3NzFlODE0MDE0YTkwNjAyMDFjYjA0NjY4ZWFlNDZlZjViZWQ0MzY5Njc0MzMxZDRmMTBiMDZmNzY5ZGIxNSIsImZpbmdlcnByaW50IjoiMzQzN2Y5YzUwMGRlMTg4YjJiN2U2Yzg4YTcxOTgxMTk4MWViNzdhZCIsImNhbGxiYWNrIjoie1wiZm9ybWRhdGFcIjp7XCJhY3Rpb25cIjpcImh0dHA6Ly9mcm9udGVuZC5zZXJ2aWNlLmV1LXdlc3QtMS53ZXRyYW5zZmVyLm5ldC93ZWJob29rcy9iYWNrZW5kXCJ9LFwiZm9ybVwiOntcInRyYW5zZmVyX2lkXCI6XCIyNjg1NjhjYjMxYTA5ZWU2MmE3NDU2ZWY2YTllMGI1MzIwMjIwNzEyMTMxNTA5XCIsXCJkb3dubG9hZF9pZFwiOjE1ODMyNDUxNTkyfX0ifQ.GKWdI6xKvgTC6SmIk_huH02H2h48oahbK3IUSNOdSCg&cf=y
         PACKAGE_SOC: s905d
         WHOAMI: king-stark
         #KERNEL_REPO_URL: https://github.com/breakings/OpenWrt/tree/main/opt/kernel
