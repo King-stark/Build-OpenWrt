@@ -31,6 +31,13 @@ jobs:
     - name: Checkout
       uses: actions/checkout@main
 
+    - name: Initialization environment
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo rm -rf /opt/*
+        df -Th
+
     - name: Clone source code
       run: |
         df -hT $PWD
