@@ -35,7 +35,7 @@ jobs:
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
-        rm -rf /opt/openwrt_packit/*
+        rm -rf /opt/openwrt_packit
         rm -rf /opt/kernel/*
         df -Th
 
