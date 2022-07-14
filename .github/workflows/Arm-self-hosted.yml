@@ -1,4 +1,4 @@
-name: Build on self-hosted
+name: Build on arm self-hosted
 
 on:
   repository_dispatch:
