@@ -42,9 +42,9 @@ jobs:
     - name: Clone source code
       run: |
         df -hT $PWD
+        git clone $REPO_URL -b $REPO_BRANCH openwrt
         ln -sf openwrt $GITHUB_WORKSPACE/openwrt
         cd openwrt
-        git pull
         useVersionInfo=$(git show -s --date=short --format="Author: %an<br/>date: %cd<br/>commit: %s<br/>commit hash: %H")
         echo "useVersionInfo=$useVersionInfo" >> $GITHUB_ENV
         echo "DATE=$(date "+%Y-%m-%d %H:%M:%S")" >> $GITHUB_ENV
@@ -60,34 +60,27 @@ jobs:
         " 
         curl -k --data chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" --data "text=${MSG}" "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
 
-#    - name: Load custom feeds
-#      run: |
-#        [ -e $FEEDS_CONF ] && mv $FEEDS_CONF openwrt/feeds.conf.default
-#        chmod +x $DIY_P1_SH
-#        cd openwrt
-#        $GITHUB_WORKSPACE/$DIY_P1_SH
+    - name: Load custom feeds
+      run: |
+        [ -e $FEEDS_CONF ] && mv $FEEDS_CONF openwrt/feeds.conf.default
+        chmod +x $DIY_P1_SH
+        cd openwrt
+        $GITHUB_WORKSPACE/$DIY_P1_SH
 
     - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a
 
-    - name: Install feeds
-      run: cd openwrt && ./scripts/feeds install -a
+#    - name: Install feeds
+#      run: cd openwrt && ./scripts/feeds install -a
 
-#    - name: Load custom configuration
-#      run: |
-#        chmod +x $DIY_P2_SH
-#        cd openwrt
-#        $GITHUB_WORKSPACE/$DIY_P2_SH
-#        cd ..
-#        [ -e files ] && mv files openwrt/files
-#        [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
-
-
-    - name: clean old cache
+    - name: Load custom configuration
       run: |
+        chmod +x $DIY_P2_SH
         cd openwrt
-        make clean
-        rm -rf tmp
+        $GITHUB_WORKSPACE/$DIY_P2_SH
+        cd ..
+        [ -e files ] && mv files openwrt/files
+        [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
        
     - name: SSH connection to Actions
       uses: P3TERX/ssh2actions@v1.0.0
