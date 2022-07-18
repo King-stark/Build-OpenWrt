@@ -5,7 +5,7 @@
 #========================================================================================================================
 
 
-name: Use Releases file to Packaging
+name: Packaging OpenWRT to Drive
 
 on:
   repository_dispatch:
